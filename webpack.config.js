@@ -3,7 +3,7 @@ const path = require('path')
 const CopyPlugin = require('copy-webpack-plugin')
 
 const config = {
-  mode: 'development',
+  mode: 'production',
   entry: path.resolve(__dirname, './viewer.js'),
   output: {
     path: path.resolve(__dirname, './public'),

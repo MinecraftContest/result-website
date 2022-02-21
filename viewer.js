@@ -13,13 +13,20 @@ function generateEmptyChunk(chunkX, chunkZ) {
 async function main () {
   const version = '1.17.1'
 
-  const modelName = window.location.search.substring(1)
+  const url = new URL(window.location.href)
 
-  const data = await fetch('data/' + modelName + '.schem').then(r => r.arrayBuffer())
+  const data = await fetch('data/models/' + url.searchParams.get('model') + '.schem').then(r => r.arrayBuffer())
   const schem = await Schematic.read(Buffer.from(data), version)
 
   const viewDistance = 10
-  const center = new Vec3(0, 90, 0)
+
+  const width = Math.abs(schem.end().x - schem.start().x)
+  const length = Math.abs(schem.end().z - schem.start().z)
+
+  const center = new Vec3(width * 0.5, 0, -1 * length * 0.5)
+  const cameraPosition = new Vec3(width * 0.75, 75, -1 * length * 0.75)
+
+  console.log(center)
 
   const World = require('prismarine-world')(version)
 
@@ -46,8 +53,11 @@ async function main () {
   // Initialize viewer, load chunks
   worldView.init(center)
 
-  viewer.camera.position.set(center.x, center.y, center.z)
-  controls.update()
+  viewer.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
+  controls.target.set(center.x, center.y, center.z)
+
+  const spinner = document.getElementById('loading-spinner')
+  spinner.parentElement.removeChild(spinner)
 
   // Browser animation loop
   const animate = () => {

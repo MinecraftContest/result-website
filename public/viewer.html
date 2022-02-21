@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Prismarine Viewer</title>
+    <title>Просмотр модели</title>
     <style type="text/css">
       html {
         overflow: hidden;
@@ -22,9 +22,119 @@
         margin: 0;
         padding: 0;
       }
+
+      .tutorial-card {
+          background-color: rgba(255, 255, 255, 0.5);
+      }
+      .text-decoration-underline-dashed {
+          text-decoration: underline;
+          text-decoration-style: dotted;
+      }
     </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
   </head>
   <body>
+    <div id="video-presentation-template" style="display: none;">
+      <video id="videoPlayer" width="100%" controls>
+        <source src="%src%" type="video/mp4">
+      </video>
+    </div>
+    <div id="pdf-presentation-template" style="display: none;">
+      <embed src="%src%" width="100%" height="640px"/>
+    </div>
+    <div id="no-presentation-template" style="display: none;">
+      <div class="text-center">
+        <h2>Команда не предоставила презентацию</h2>
+      </div>
+    </div>
+    <div class="modal fade" id="presentationModal" tabindex="-1" aria-labelledby="presentationModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="presentationModalLabel">Презентация проекта </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div id="presentationModalBody" class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fixed-top p-4 row">
+      <div class="col-1">
+        <a href="/" class="btn btn-primary">&lt; Назад</a>
+      </div>
+      <div class="col-2">
+        <h2 id="title-text"></h2>
+      </div>
+      <div class="col-2">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#presentationModal">
+          Показать презентацию
+        </button>
+      </div>
+      <div class="col">
+        <div id="loading-spinner" class="text-center">
+          <div class="spinner-border" style="width: 2.5rem; height: 2.5rem;" role="status">
+          </div>
+          <h3>Загрузка модели ...</span>
+        </div>
+      </div>
+    </div>
+    <div class="position-absolute bottom-0 start-0 tutorial-card p-5 m-5 rounded-3">
+      <h3>Управление просмотром</h3>
+      <p><span class="text-decoration-underline-dashed" data-bs-toggle="tooltip" data-bs-placement="top" title="Левая кнопка мыши">ЛКМ</span> - вращение модели</p>
+      <p><span class="text-decoration-underline-dashed" data-bs-toggle="tooltip" data-bs-placement="top" title="Правая кнопка мыши">ПКМ</span> - перемещение центра вращения</p>
+      <p>Колесико - изменение масштаба (zoom)</p>
+      <svg version="1.1" id="mouse_icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+          width="175px" height="175px" viewBox="0 0 50 50.001" style="enable-background:new 0 0 50 50.001;" xml:space="preserve">
+        <g>
+          <path d="M25.555,11.909c-1.216,0-2.207,1.963-2.207,4.396c0,2.423,0.991,4.395,2.207,4.395c1.208,0,2.197-1.972,2.197-4.395
+            C27.751,13.872,26.762,11.909,25.555,11.909z"/>
+          <path d="M18.22,5.842c4.432,0,6.227,0.335,6.227,3.653h2.207c0-5.851-4.875-5.851-8.433-5.851c-4.422,0-6.227-0.326-6.227-3.644
+            H9.795C9.795,5.842,14.671,5.842,18.22,5.842z"/>
+          <path d="M29.62,9.495c0.209,0.632,0.331,1.315,0.331,2.031v9.548c0,2.681-1.562,4.91-3.608,5.387
+            c0.004,0.031,0.021,0.059,0.021,0.1v7.67c0,0.445-0.363,0.81-0.817,0.81c-0.445,0-0.809-0.365-0.809-0.81v-7.67
+            c0-0.041,0.019-0.068,0.022-0.1c-2.046-0.477-3.609-2.706-3.609-5.387v-9.548c0-0.715,0.121-1.399,0.331-2.031
+            c-6.057,1.596-10.586,7.089-10.586,13.632v12.716c-0.001,7.787,6.37,14.158,14.155,14.158h0.999
+            c7.786,0,14.156-6.371,14.156-14.158V23.127C40.206,16.584,35.676,11.091,29.62,9.495z"/>
+        </g>
+      </svg>
+    </div>
+    <script>
+      var url = new URL(window.location.href);
+      document.getElementById('title-text').innerHTML = url.searchParams.get("title")
+      presentationType = url.searchParams.get('ptype')
+      const body = document.createElement('div')
+
+      var templateElement = undefined
+      if (presentationType == 'video') {
+        templateElement = document.getElementById('video-presentation-template')
+      } else if (presentationType == 'pdf') {
+        templateElement = document.getElementById('pdf-presentation-template')
+      } else {
+        templateElement = document.getElementById('no-presentation-template')
+      }
+      const template = templateElement.innerHTML
+      templateElement.parentElement.removeChild(templateElement)
+
+      body.innerHTML = template.replace('%src%', '/data/media/' + url.searchParams.get('psrc'))
+      document.getElementById('presentationModalBody').appendChild(body)
+
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+      })
+
+      var presentationModal = document.getElementById('presentationModal')
+      presentationModal.addEventListener('hidden.bs.modal', function (event) {
+        const player = document.getElementById('videoPlayer')
+        if (player) {
+          player.pause()
+        }
+      })
+    </script>
     <script type="text/javascript" src="viewer.js"></script>
   </body>
 </html>
