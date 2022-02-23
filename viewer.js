@@ -16,15 +16,15 @@ async function main () {
   const url = new URL(window.location.href)
 
   const data = await fetch('data/models/' + url.searchParams.get('model') + '.schem').then(r => r.arrayBuffer())
-  const schem = await Schematic.read(Buffer.from(data), version)
+  const schem = await Schematic.read(Buffer.from(data), '1.18')
 
   const viewDistance = 10
 
   const width = Math.abs(schem.end().x - schem.start().x)
   const length = Math.abs(schem.end().z - schem.start().z)
 
-  const center = new Vec3(width * 0.5, 0, -1 * length * 0.5)
-  const cameraPosition = new Vec3(width * 0.75, 75, -1 * length * 0.75)
+  const center = new Vec3(150, 65, 120) // new Vec3(width * 0.5, 0, -1 * length * 0.5)
+  const cameraPosition = new Vec3(200, 105, 45) // new Vec3(width * 0.75, 75, -1 * length * 0.75)
 
   console.log(center)
 
@@ -58,6 +58,13 @@ async function main () {
 
   const spinner = document.getElementById('loading-spinner')
   spinner.parentElement.removeChild(spinner)
+
+
+  // debug
+  // document.viewer = viewer
+  // document.controls = controls
+  // document.schem = schem
+  // document.vec3 = Vec3
 
   // Browser animation loop
   const animate = () => {
