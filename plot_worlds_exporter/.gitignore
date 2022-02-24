@@ -1,0 +1,6 @@
+env/
+flat_world_template/*
+!flat_world_template/level.dat
+input/
+output/
+tmp/
