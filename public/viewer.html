@@ -35,17 +35,19 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
   </head>
   <body>
-    <div id="video-presentation-template" style="display: none;">
-      <video id="videoPlayer" width="100%" controls>
-        <source src="%src%" type="video/mp4">
-      </video>
-    </div>
-    <div id="pdf-presentation-template" style="display: none;">
-      <embed src="%src%" width="100%" height="640px"/>
-    </div>
-    <div id="no-presentation-template" style="display: none;">
-      <div class="text-center">
-        <h2>Команда не предоставила презентацию</h2>
+    <div id="templates">
+      <div id="video-presentation-template" style="display: none;">
+        <video id="videoPlayer" width="100%" controls>
+          <source src="%src%" type="video/mp4">
+        </video>
+      </div>
+      <div id="pdf-presentation-template" style="display: none;">
+        <embed src="%src%" width="100%" height="640px"/>
+      </div>
+      <div id="no-presentation-template" style="display: none;">
+        <div class="text-center">
+          <h2>Команда не предоставила презентацию</h2>
+        </div>
       </div>
     </div>
     <div class="modal fade" id="presentationModal" tabindex="-1" aria-labelledby="presentationModalLabel" aria-hidden="true">
@@ -55,7 +57,7 @@
             <h5 class="modal-title" id="presentationModalLabel">Презентация проекта </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div id="presentationModalBody" class="modal-body"></div>
+          <div id="presentationModalBody" class="modal-body overflow-auto"></div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
           </div>
@@ -105,28 +107,42 @@
     <script>
       var url = new URL(window.location.href);
       document.getElementById('title-text').innerHTML = url.searchParams.get("title")
-      presentationType = url.searchParams.get('ptype')
+      presentation = url.searchParams.get('pres')
       const body = document.createElement('div')
 
-      var templateElement = undefined
-      if (presentationType == 'video') {
-        templateElement = document.getElementById('video-presentation-template')
-      } else if (presentationType == 'pdf') {
-        templateElement = document.getElementById('pdf-presentation-template')
+      if (presentation) {
+        items = presentation.split(';;;')
+        for (const item of items) {
+          parts = item.split(':::')
+          type = parts[0]
+          value = parts[1]
+          var templateElement = undefined
+          if (type == 'video') {
+            templateElement = document.getElementById('video-presentation-template')
+          } else if (type == 'pdf') {
+            templateElement = document.getElementById('pdf-presentation-template')
+          }
+          if (templateElement) {
+            const template = templateElement.innerHTML
+            body.innerHTML += template.replace('%src%', '/data/media/' + value)
+          }
+        }
       } else {
-        templateElement = document.getElementById('no-presentation-template')
+        body.innerHTML = document.getElementById('no-presentation-template').innerHTML
       }
-      const template = templateElement.innerHTML
-      templateElement.parentElement.removeChild(templateElement)
 
-      body.innerHTML = template.replace('%src%', '/data/media/' + url.searchParams.get('psrc'))
+      const templatesParent = document.getElementById('templates')
+      templatesParent.parentElement.removeChild(templatesParent)
+
       document.getElementById('presentationModalBody').appendChild(body)
 
+      // Bootstrap init
       var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
       var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
       })
 
+      // Stop video on modal close
       var presentationModal = document.getElementById('presentationModal')
       presentationModal.addEventListener('hidden.bs.modal', function (event) {
         const player = document.getElementById('videoPlayer')

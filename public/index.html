@@ -41,9 +41,12 @@
                 const url = new URL("/viewer", document.location.origin);
                 url.searchParams.append("model", e.model)
                 url.searchParams.append("title", e.title)
-                if ('presentationType' in e) {
-                    url.searchParams.append('ptype', e.presentationType)
-                    url.searchParams.append('psrc', e.presentationSrc)
+                if ('pres' in e) {
+                    var items = []
+                    for (const p of e.pres) {
+                        items.push(p.type + ':::' + p.src)
+                    }
+                    url.searchParams.append('pres', items.join(';;;'))
                 }
                 element.innerHTML = tempalate
                     .replace("%title%", e.title)
