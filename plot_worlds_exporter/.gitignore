@@ -4,3 +4,7 @@ flat_world_template/*
 input/
 output/
 tmp/
+convert_tmp/
+offline_world/
+offline_output/
+j2b
