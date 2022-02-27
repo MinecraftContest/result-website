@@ -38,7 +38,7 @@
             const tempalate = document.getElementById('list-element-tempalate').innerHTML
             for (const e of data) {
                 var element = document.createElement('div')
-                const url = new URL("/viewer", document.location.origin);
+                const url = new URL("/viewer.html", document.location.origin);
                 url.searchParams.append("model", e.model)
                 url.searchParams.append("title", e.title)
                 if ('pres' in e) {
