@@ -12,7 +12,7 @@ OUTPUT_METADATA_FILE = "../public/data/metadata.json"
 
 MEDIA_ID_GENERATOR = 1
 
-with open("metadata_editor.csv") as metadata_file:
+with open("metadata_editor.csv", "r", encoding="utf8") as metadata_file:
     reader = csv.DictReader(metadata_file)
 
     public_metadata = []
@@ -29,6 +29,9 @@ with open("metadata_editor.csv") as metadata_file:
             continue
 
         modelname = "model{}".format(simple_id)
+        schem_file = "model{}.schem".format(simple_id)
+        je_world_file = "plot_{}_world.zip".format(simple_id)
+        be_world_file = "plot_{}_world.mcworld".format(simple_id)
 
         # Presentations
         presentations = item["Presentations"]
@@ -54,10 +57,26 @@ with open("metadata_editor.csv") as metadata_file:
                 "src": media_file_name
             })
 
+        try:
+            place = int(item["Place"])
+        except:
+            place = 0
+
+        try:
+            points = int(item["Points"])
+        except:
+            points = 0
+
         meta = {
             "title": "Команда {}".format(simple_id),
+            "place": place,
+            "points": points,
+            "authors": item["Authors"].split(";;"),
             "model": modelname,
-            "pres": pres
+            "pres": pres,
+            "schem_file": schem_file,
+            "je_world_file": je_world_file,
+            "be_world_file": be_world_file
         }
         public_metadata.append(meta)
         shutil.copyfile(

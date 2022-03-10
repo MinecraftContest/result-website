@@ -87,6 +87,7 @@ def main():
 
     for item in metadata:
         plot_id = item["id"]
+        plot_list_id = item["plot_list_id"]
         plot_x = int(plot_id.split(".")[1])
         plot_z = int(plot_id.split(".")[2])
         converted_region = convert_plot(config, plot_x, plot_z)
@@ -97,7 +98,7 @@ def main():
         shutil.copyfile(os.path.join(args.template, "level.dat"), os.path.join(TEMP_PATH, "level.dat"))
         converted_region.save(os.path.join(TEMP_PATH, "region","r.0.0.mca"))
 
-        exported_world_name = "plot_{}_{}_world".format(plot_x, plot_z)
+        exported_world_name = "plot_{}_world".format(plot_list_id)
         shutil.make_archive(os.path.join(args.output, exported_world_name), 'zip', "tmp/")
 
 main()
